@@ -22,7 +22,10 @@ option,
 input {
   font-family: 'Helvetica';
   font-weight: 400;
+  padding: 5px 30px;
+  border-radius: 12px;
 }
+
 
 body {
   margin: 0;
