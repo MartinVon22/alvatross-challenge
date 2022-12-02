@@ -9,27 +9,60 @@ h1 {
     align-items: center;
     flex-direction: column;
     height: 100vh;
+    margin-top: -10px;
 }
 
 .header {
-    width: 50%;
+    width: 60%;
 }
 
 .boxRooms {
-    width: 50%;
-    margin-top: 50px;
-    height: 500px;
+    display: inline-block;
+    width: 60%;
     border: 2px solid #2E344D;
     border-radius: 26px;
+    padding: 10px;
 }
 
-.loadingRooms {
+.loadingContainer {
     display: flex;
-    justify-content: center;
     font-family: 'Helvetica Bold';
 }
 
 .loader {
     margin-top: 10px;
     margin-right: 20px;
+}
+
+.room {
+    display: inline-block;
+    min-width: 275px;
+    height: 350px;
+    background-color: #F5F7FB;
+    border-radius: 26px;
+    margin: 5px;
+}
+
+.informationRoom {
+    display: grid;
+    place-items: center;
+}
+
+.btn {
+    border: 0;
+    cursor: pointer;
+    padding: 15px 40px;
+    font-family: 'Helvetica';
+    border-radius: 12px;
+    color: white;
+    background: #2E344D;
+}
+
+.btn-modify {
+    margin: 50px 10px;
+}
+
+.btn-create {
+    margin-top: 5px;
+    margin-right: 5px;
 }
