@@ -22,3 +22,14 @@ h1 {
     border: 2px solid #2E344D;
     border-radius: 26px;
 }
+
+.loadingRooms {
+    display: flex;
+    justify-content: center;
+    font-family: 'Helvetica Bold';
+}
+
+.loader {
+    margin-top: 10px;
+    margin-right: 20px;
+}

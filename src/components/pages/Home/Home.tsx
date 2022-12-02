@@ -22,6 +22,7 @@ export const Home = () => {
 
     const handleChange = (e: any) => {
         setPlantSelected(e.target.value);
+        setRoomsLoading(true);
     }
 
     return (
@@ -43,10 +44,17 @@ export const Home = () => {
                     {rooms && rooms.map((room) => (
                         <p>Seleccione una opción para visualizar las Salas disponibles.</p>        
                     ))}
-                    {!rooms && (
-                        <p style={{ textAlign: 'center' }}>Seleccione una Planta para visualizar las Salas disponibles de la misma.</p>
+                    {!rooms && !roomsLoading && (
+                        <p style={{ textAlign: 'center', fontFamily: 'Helvetica Bold' }}>Seleccione una Planta para visualizar las Salas disponibles de la misma.</p>
                     )}
-                    {roomsLoading && <Loader />}
+                    {roomsLoading && (
+                        <>
+                            <div className="loadingRooms">
+                                <Loader />
+                                <p>Cargando Salas...</p>
+                            </div>
+                        </>
+                    )}
                 </div>
         </div>
     )

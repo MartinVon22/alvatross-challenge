@@ -1,15 +1,15 @@
 .loader {
-    width: 38px;
-    height: 38px;
-    border: 5px solid #2E344D;
+    width: 28px;
+    height: 28px;
+    border: 2px solid #2E344D;
     border-bottom-color: transparent;
     border-radius: 50%;
     display: inline-block;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
-    }
+}
 
-    @keyframes rotation {
+@keyframes rotation {
     0% {
         transform: rotate(0deg);
     }
