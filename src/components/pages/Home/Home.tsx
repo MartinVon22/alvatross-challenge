@@ -14,6 +14,7 @@ export const Home = () => {
     const [activeCreateRoomPage, setActiveCreateRoomPage] = useState(false);
     const [creatingRoomStep, setCreatingRoomStep] = useState(0);
     const [countRedirectPage, setCountRedirectPage] = useState(3);
+    const [errorMsg, setErrorMsg] = useState('');
 
     /* states for new rooms  */
     const [newRoomName, setNewRoomName] = useState('');
@@ -77,26 +78,39 @@ export const Home = () => {
 
     const handleCreateRoom = () => {
         if (plantSelected) {
-            setCreatingRoomStep(1);
-            createRoom(plantSelected?.id).then(res => {
-                if (res.status === 201) {
 
-                    let newRoom: Room = {
-                        name: newRoomName,
-                        maximumCapacity: Number(newRoomMaximumCapacity),
-                        ocupation: Number(newRoomOcupation)
+            if (newRoomName.length && Number(newRoomMaximumCapacity) != 0 && Number(newRoomOcupation) != 0) {
+                setCreatingRoomStep(1);
+                createRoom(plantSelected?.id).then(res => {
+                    if (res.status === 201) {
+    
+                        let newRoom: Room = {
+                            name: newRoomName,
+                            maximumCapacity: Number(newRoomMaximumCapacity),
+                            ocupation: Number(newRoomOcupation)
+                        }
+    
+                        setRooms(current => [...current, newRoom]);
+                        setCreatingRoomStep(2);
+                        setErrorMsg('');
+                        setNewRoomOcupation('');
+                        setNewRoomMaximumCapacity('');
+                        setNewRoomName('');
                     }
-
-                    setRooms(current => [...current, newRoom]);
-
-                    setCreatingRoomStep(2);
-                }
-            }).catch(err => {
-                console.log(err);
-                setCreatingRoomStep(0);
-            })
+                }).catch(err => {
+                    console.log(err);
+                    setCreatingRoomStep(0);
+                    setErrorMsg('');
+                })
+            } else {
+                setErrorMsg('Has dejado campos sin completar.')
+            }
         }
+    }
 
+    const goBack = () => {
+        setActiveCreateRoomPage(false); 
+        setErrorMsg('');
     }
 
     return (
@@ -142,6 +156,7 @@ export const Home = () => {
                                 {rooms.length !== 0 && rooms.map((room) => (
                                     <>
                                         <div className="room">
+                                            <p style={{ textAlign: 'center', color: '#ff664d' }}>{!activeCreateRoomPage && errorMsg.length !== 0 && errorMsg}</p>
                                             <h4 style={{ marginLeft: '20px', color: '#2E344D' }}>{room.name}</h4>
 
                                             <div className="informationRoom">
@@ -177,21 +192,22 @@ export const Home = () => {
             )}
             {activeCreateRoomPage && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
-                    <div className="room" style={{ height: '50%' }}>
+                    <div className="room" style={{ height: '55%' }}>
+                        <p style={{ textAlign: 'center', color: '#ff664d' }}>{activeCreateRoomPage && errorMsg.length !== 0 && errorMsg}</p>
                         <h4 style={{ marginLeft: '20px', color: '#2E344D' }}>Agregar nueva sala a la Planta {plantSelected?.id}</h4>
 
                         <div className="informationRoom">
                             <div>
                                 <h5 style={{ color: '#2E344D' }}>Nombre de la Sala</h5>
-                                <input type="text" name="maximumCapacity" placeholder='Ingrese un Nombre' onKeyUp={(e) => setNewRoomName(e.currentTarget.value)} style={{ width: '130px' }}/>
+                                <input type="text" name="maximumCapacity" placeholder='Ingrese un Nombre' onKeyUp={(e) => setNewRoomName(e.currentTarget.value)} style={{ width: '130px' }} required/>
                             </div>
                             <div>
                                 <h5 style={{ color: '#2E344D' }}>Capacidad máxima</h5>
-                                <input type="number" name="ocupation" placeholder='Ingrese un valor' onKeyUp={(e) => setNewRoomMaximumCapacity(e.currentTarget.value)} style={{ width: '130px' }}/>
+                                <input type="number" name="ocupation" min={1} placeholder='Ingrese un valor' onChange={(e) => setNewRoomMaximumCapacity(e.currentTarget.value)} style={{ width: '130px' }} required/>
                             </div>
                             <div>
                                 <h5 style={{ color: '#2E344D' }}>Ocupación</h5>
-                                <input type="number" name="ocupation" placeholder='Ingrese un valor' onKeyUp={(e) => setNewRoomOcupation(e.currentTarget.value)} style={{ width: '130px' }}/>
+                                <input type="number" name="ocupation" min={1} placeholder='Ingrese un valor' onChange={(e) => setNewRoomOcupation(e.currentTarget.value)} style={{ width: '130px' }} required/>
                             </div>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
@@ -208,7 +224,14 @@ export const Home = () => {
                             )}
 
                             {creatingRoomStep === 0 && (
-                                <button className="btn" onClick={handleCreateRoom}>Crear sala</button>
+                                <>
+                                    <div>
+                                        <button className="btn" onClick={handleCreateRoom}>Crear sala</button>
+                                        <p style={{ textAlign: 'center', lineHeight: '60px' }}>
+                                            <a href='#' onClick={goBack} >Volver atrás</a>
+                                        </p>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </div>
