@@ -11,3 +11,11 @@ export function getPlants() {
 export function getRooms(plantId: number) {
     return axios.get<Room[]>(`${URL_ENDPOINT}/plant/${plantId}/rooms`);
 }
+
+export function createRoom(plantId: number) {
+    return axios.post<Room>(`${URL_ENDPOINT}/plant/${plantId}/room`);
+}
+
+export function updateRoom(roomId: number) {
+    return axios.put<Room>(`${URL_ENDPOINT}/room/${roomId}`);
+}
