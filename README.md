@@ -19,6 +19,8 @@ http://localhost:3000
 
 ## Construcción del Proyecto.
 
+Antes que nada quiero aclarar que he hecho uso de <a href="https://apimocha.com/">Api Mocha</a> para mockear consultas a un supuesto servicio, cada servicio mockeado tiene un retraso de respuesta de 3 segundos.
+
 He decidido hacer uso de los hooks de React como useEffect y useState para manipular información que irá cambiando con las acciones que hagamos en la aplicación.
 También he ido un poco más allá y he agregado spinner de carga para indicar que algo se está tomando desde la API y también he deshabilitado/habilitado botones cuando realizamos una acción para esperar a la información que llegue desde el Servicio.
 
