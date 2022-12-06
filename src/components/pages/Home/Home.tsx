@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plant } from '../../../core/models/plant';
 import { Room } from '../../../core/models/room';
-import {createRoom, getPlants, getRooms} from '../../../core/services/roomsService';
+import {createRoom, getPlants, getRooms, updateRoom} from '../../../core/services/roomsService';
+import { Alert } from '../../../shared/components/Alert/Alert';
 import { Loader } from '../../../shared/components/Loader/Loader';
 import './Home.css';
 
@@ -14,7 +15,9 @@ export const Home = () => {
     const [activeCreateRoomPage, setActiveCreateRoomPage] = useState(false);
     const [creatingRoomStep, setCreatingRoomStep] = useState(0);
     const [countRedirectPage, setCountRedirectPage] = useState(3);
-    const [errorMsg, setErrorMsg] = useState('');
+    const [alertMsg, setAlertMsg] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+    const [editingRoom, setEditingRoom] = useState(-1);
 
     /* states for new rooms  */
     const [newRoomName, setNewRoomName] = useState('');
@@ -50,6 +53,17 @@ export const Home = () => {
         }    
     }, [creatingRoomStep])
 
+    useEffect(() => {
+
+        if (showAlert) {
+            setTimeout(() => {
+                setAlertMsg('');
+                setShowAlert(false);
+            }, 2000)
+        }
+
+    }, [showAlert])
+
     const handleChange = (e: any) => {
         setRooms([]);
         setPlantSelected(undefined);
@@ -79,12 +93,13 @@ export const Home = () => {
     const handleCreateRoom = () => {
         if (plantSelected) {
 
-            if (newRoomName.length && Number(newRoomMaximumCapacity) != 0 && Number(newRoomOcupation) != 0) {
+            if (newRoomName.length && Number(newRoomMaximumCapacity) !== 0 && Number(newRoomOcupation) !== 0) {
                 setCreatingRoomStep(1);
                 createRoom(plantSelected?.id).then(res => {
                     if (res.status === 201) {
     
                         let newRoom: Room = {
+                            id: rooms[rooms.length - 1].id + 1,
                             name: newRoomName,
                             maximumCapacity: Number(newRoomMaximumCapacity),
                             ocupation: Number(newRoomOcupation)
@@ -92,7 +107,7 @@ export const Home = () => {
     
                         setRooms(current => [...current, newRoom]);
                         setCreatingRoomStep(2);
-                        setErrorMsg('');
+                        setAlertMsg('');
                         setNewRoomOcupation('');
                         setNewRoomMaximumCapacity('');
                         setNewRoomName('');
@@ -100,24 +115,59 @@ export const Home = () => {
                 }).catch(err => {
                     console.log(err);
                     setCreatingRoomStep(0);
-                    setErrorMsg('');
+                    setAlertMsg('Ha ocurrido un error.');
                 })
             } else {
-                setErrorMsg('Has dejado campos sin completar.')
+                setAlertMsg('Has dejado campos sin completar.')
+            }
+        }
+    }
+
+    const handleModify = (room: Room) => {
+        if (plantSelected) {
+            if (room.name.length && Number(room.maximumCapacity) !== 0 && Number(room.ocupation) !== 0) {
+                setEditingRoom(room.id);
+                updateRoom(room.id).then((res) => {
+                    if (res.status === 200) {
+                        
+                        let roomUpdated: Room = {
+                            id: room.id,
+                            name: room.name,
+                            maximumCapacity: Number(room.maximumCapacity),
+                            ocupation: Number(room.ocupation)
+                        }
+
+                        let idxToUpd = rooms.findIndex(r => r.id === room.id);
+                        rooms[idxToUpd] = roomUpdated;
+
+                        setShowAlert(true);
+                        setAlertMsg('La Sala ha sido actualizada con éxito.');
+                        setEditingRoom(-1);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    setAlertMsg('');
+                    setShowAlert(true);
+                    setAlertMsg('Ha ocurrido un error.');
+                })
+            } else {
+                setShowAlert(true);
+                setAlertMsg('Has dejado campos sin completar o hay valores en 0');
             }
         }
     }
 
     const goBack = () => {
         setActiveCreateRoomPage(false); 
-        setErrorMsg('');
+        setShowAlert(false);
+        setAlertMsg('');
     }
 
     return (
         <>
             {!activeCreateRoomPage && (
                 <div className="homeContainer">
-
+                        {!activeCreateRoomPage && showAlert && <Alert title={alertMsg} success={true}/>}
                         <>
                             <div className="header">
                                 <h1 style={{ color: '#2E344D' }}>Salas</h1>
@@ -156,21 +206,21 @@ export const Home = () => {
                                 {rooms.length !== 0 && rooms.map((room) => (
                                     <>
                                         <div className="room">
-                                            <p style={{ textAlign: 'center', color: '#ff664d' }}>{!activeCreateRoomPage && errorMsg.length !== 0 && errorMsg}</p>
                                             <h4 style={{ marginLeft: '20px', color: '#2E344D' }}>{room.name}</h4>
 
                                             <div className="informationRoom">
                                                 <div>
                                                     <h5 style={{ color: '#2E344D' }}>Capacidad máxima</h5>
-                                                    <input type="text" name="maximumCapacity" placeholder={`${room.maximumCapacity}`} value={room.maximumCapacity} style={{ width: '130px' }}/>
+                                                    <input type="number" name="maximumCapacity" min={0} placeholder={`${room.maximumCapacity}`} defaultValue={room.maximumCapacity} onChange={e => room.maximumCapacity = Number(e.target.value)} style={{ width: '130px' }}/>
                                                 </div>
                                                 <div>
                                                     <h5 style={{ color: '#2E344D' }}>Ocupación</h5>
-                                                    <input type="text" name="ocupation" placeholder={`${room.ocupation} %`} value={`${room.ocupation} %`} style={{ width: '130px' }}/>
+                                                    <span className='percent'>%</span>
+                                                    <input type="number" name="ocupation" min={0} placeholder={`${room.ocupation} %`} defaultValue={room.ocupation} onChange={e => room.ocupation = Number(e.target.value)} style={{ width: '130px' }}/>
                                                 </div>
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'end' }}>
-                                                <button className="btn btn-modify">Modificar</button>
+                                                <button className="btn btn-modify" disabled={editingRoom === room.id} onClick={() => handleModify(room)}>{editingRoom === room.id ? 'Espere, por favor..' : 'Modificar'}</button>
                                             </div>
                                         </div>            
                                     </>
@@ -193,7 +243,7 @@ export const Home = () => {
             {activeCreateRoomPage && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
                     <div className="room" style={{ height: '55%' }}>
-                        <p style={{ textAlign: 'center', color: '#ff664d' }}>{activeCreateRoomPage && errorMsg.length !== 0 && errorMsg}</p>
+                        <p style={{ textAlign: 'center', color: '#ff664d' }}>{activeCreateRoomPage && alertMsg.length !== 0 && alertMsg}</p>
                         <h4 style={{ marginLeft: '20px', color: '#2E344D' }}>Agregar nueva sala a la Planta {plantSelected?.id}</h4>
 
                         <div className="informationRoom">
