@@ -43,3 +43,8 @@ code {
 a {
   color: #2E344D;
 }
+
+button:disabled {
+  background-color: #2e344d94;
+  cursor: not-allowed;
+}
